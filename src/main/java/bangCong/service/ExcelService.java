@@ -13,4 +13,11 @@ public interface ExcelService {
 
     // lấy danh sách thông tin nhân viên
     public List<String> employeeInfo(Sheet sheet,String findInfo,List<String> infoEmployee);
+
+    // lấy danh sách ca ngày thường
+    List<String> getWeekdayShifts(Sheet sheet, int startColumn, int endColumn);
+
+    // lấy danh sách ca ngày chủ nhật
+    List<String> getSundayShifts(Sheet sheet, int startColumn, int endColumn);
+
 }

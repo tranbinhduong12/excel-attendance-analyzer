@@ -35,9 +35,28 @@ public class Main {
 
             // lấy danh sách tên nv
             List<String> employeeName = service.employeeInfo(sheet, "Họ tên", new ArrayList<>());
-            System.out.println("\n List of employee name: ");
+            System.out.println("\nList of employee name: ");
             employeeName.forEach(System.out::println);
 
+            // danh sách ca ngày thường và ngày chủ nhật
+            int startColumn = 3;
+            int endColumn = 15;
+
+            List<String> weekdayShifts = service.getWeekdayShifts(sheet, startColumn, endColumn);
+            List<String> sundayShifts = service.getSundayShifts(sheet, startColumn, endColumn);
+
+            int totalWeekdayShifts = weekdayShifts.size();
+            int totalSundayShifts = sundayShifts.size();
+
+            List<String> allShifts = new ArrayList<>();
+            allShifts.addAll(weekdayShifts);
+            allShifts.addAll(sundayShifts);
+
+            System.out.println("\nList of weekday shifts:");
+            weekdayShifts.forEach(System.out::println);
+
+            System.out.println("\nList of sunday shifts:");
+            sundayShifts.forEach(System.out::println);
 
         } catch (Exception e) {
             System.out.println("error reading excel file:" + e.getMessage());
