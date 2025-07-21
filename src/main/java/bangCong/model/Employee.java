@@ -6,11 +6,14 @@ import java.util.List;
 public class Employee {
     private String id;
     private String name;
-    private Double totalHoursWorked;
-    private Integer totalDaysWorked;
+    private Double totalHoursWorked; // tổng giờ làm = GC + TC + GC1 + TC1 + WK-D + WK-N
+    private Integer totalDaysWorked; // tổng lương = (GC*giáGC + TC*giáTC + ...) + tiền WK
     private Double totalEaring;
+    private List<Double> priceMoiCa;
 
-    public Employee() {
+    public Employee(String id, String name) {
+        this.id = id;
+        this.name = name;
     }
 
     public Employee(String id, String name, Double totalHoursWorked, Integer totalDaysWorked, Double totalEaring) {
@@ -59,5 +62,12 @@ public class Employee {
 
     public void setTotalEaring(Double totalEaring) {
         this.totalEaring = totalEaring;
+    }
+
+    @Override
+    public String toString() {
+        return "employee: " + id + " - " + name + "\n"
+                + " Tổng giờ: " + totalHoursWorked + "h\n"
+                + " Tổng tiền: " + String.format("%,.0f", totalEaring) + " VND\n";
     }
 }
