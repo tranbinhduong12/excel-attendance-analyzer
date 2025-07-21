@@ -1,6 +1,5 @@
 package bangCong.model;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class Employee {
@@ -64,10 +63,37 @@ public class Employee {
         this.totalEaring = totalEaring;
     }
 
+    private Double actualTotalFromExcel; // so sánh tổng tiền tính đc với tổng tiền ở cột Q
+
+    public void setActualTotalFromExcel(Double actualTotalFromExcel) {
+        this.actualTotalFromExcel = actualTotalFromExcel;
+    }
+
+    public Double getActualTotalFromExcel() {
+        return actualTotalFromExcel;
+    }
+
+//    @Override
+//    public String toString() {
+//        return "employee: " + id + " - " + name + "\n"
+//                + " Tổng giờ: " + totalHoursWorked + "h\n"
+//                + " Tổng tiền: " + String.format("%,.0f", totalEaring) + " VND\n";
+//    }
+
     @Override
     public String toString() {
-        return "employee: " + id + " - " + name + "\n"
-                + " Tổng giờ: " + totalHoursWorked + "h\n"
-                + " Tổng tiền: " + String.format("%,.0f", totalEaring) + " VND\n";
+        StringBuilder sb = new StringBuilder();
+        sb.append("Employee: ").append(id).append(" - ").append(name).append("\n");
+        sb.append(" Tổng giờ: ").append(totalHoursWorked).append("h\n");
+        sb.append(" Tổng tiền (tính): ").append(String.format("%,.0f", totalEaring)).append(" VND\n");
+        sb.append(" Tổng tiền (trong file): ").append(String.format("%,.0f", actualTotalFromExcel)).append(" VND\n");
+
+        if (Math.abs(totalEaring - actualTotalFromExcel) > 1e-2) {
+            sb.append("Kết quả: Không khớp\n");
+        } else {
+            sb.append("Kết quả: Khớp\n");
+        }
+
+        return sb.toString();
     }
 }

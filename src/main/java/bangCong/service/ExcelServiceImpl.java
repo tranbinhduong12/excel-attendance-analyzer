@@ -66,9 +66,18 @@ public class ExcelServiceImpl implements ExcelService {
 //                System.out.println("Row " + i + ": CN = " + cn + ", GC = " + gc + ", TC = " + tc);
 //                System.out.println("Money CN = " + moneyCN + ", GC = " + moneyGC + ", TC = " + moneyTC);
 
+                // in ra tổng tiền cột Q
+                double colQ = getCellNumeric(row.getCell(16), evaluator);
+
+                double actualTotalFromExcel = getCellNumeric(row.getCell(16), evaluator);
+
+
+
+
                 Employee emp = new Employee(maNV, tenNV);
                 emp.setTotalHoursWorked(totalHours);
                 emp.setTotalEaring(totalMoney);
+                emp.setActualTotalFromExcel(actualTotalFromExcel);
                 employeeList.add(emp);
             }
             //in kết quả
