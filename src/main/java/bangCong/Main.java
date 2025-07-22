@@ -73,6 +73,10 @@ public class Main {
                 }
 
             }
+
+            // Lấy giá trị cột Q
+            List<Double> columnQValues = excelService.extractColumnQ(sheet, 6, 6 + listNameNVs.size(), workbook);
+
             //tính tổng số giờ làm mỗi nv
             for (int i = 0; i < listNameNVs.size(); i++) {
                 Employee infoEmployee = new Employee();
@@ -94,13 +98,21 @@ public class Main {
             System.out.print("Tổng số giờ làm việc của các nhân viên là: ");
             System.out.println();
             DecimalFormat dc = new DecimalFormat("0.00");
-            employeeInfo.stream().forEach(x -> System.out.println(
-                    "Nhân viên:\n" +
-                            "\tTên: " + x.getName() + "\n" +
-                            "\tMã NV: " + x.getId() + "\n" +
-                            "\tTổng số giờ làm: " + x.getTotalHoursWorked() + "\n" +
-                            "\tTổng tiền các ca làm: " + dc.format(x.getTotalPrice()) + "\n"
-            ));
+            for (int i = 0; i < employeeInfo.size(); i++) {
+                Employee emp = employeeInfo.get(i);
+                double colQ = columnQValues.get(i);
+                double difference = Math.abs(emp.getTotalPrice() - colQ);
+                String comparison = (difference < 0.01) ? "Khớp" : "Không khớp (chênh lệch: " + dc.format(difference) + ")";
+                System.out.println(
+                        "Nhân viên:\n" +
+                                "\tTên: " + emp.getName() + "\n" +
+                                "\tMã NV: " + emp.getId() + "\n" +
+                                "\tTổng số giờ làm: " + emp.getTotalHoursWorked() + "\n" +
+                                "\tTổng tiền các ca làm: " + dc.format(emp.getTotalPrice()) + "\n" +
+                                "\tTổng tiền cột Q: " + dc.format(colQ) + "\n" +
+                                "\tSo sánh với cột Q: " + comparison + "\n"
+                );
+            }
 
         } catch (IOException e) {
             e.printStackTrace();

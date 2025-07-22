@@ -3,6 +3,9 @@ package bangCong.service;
 import bangCong.model.Employee;
 import org.apache.poi.ss.usermodel.*;
 
+import org.apache.poi.ss.usermodel.FormulaEvaluator;
+import org.apache.poi.ss.usermodel.Workbook;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -165,5 +168,42 @@ public class ExcelServiceImpl implements ExcelService {
             }
         }
         return map;
+    }
+
+    // lấy giá trị cột Q
+    public List<Double> extractColumnQ(Sheet sheet, int startRow, int endRow, Workbook workbook) {
+        List<Double> columnQValues = new ArrayList<>();
+        FormulaEvaluator evaluator = workbook.getCreationHelper().createFormulaEvaluator();
+
+        for (int i = startRow; i < endRow; i++) {
+            Row row = sheet.getRow(i);
+            if (row == null) {
+                columnQValues.add(0.0);
+                continue;
+            }
+            Cell cell = row.getCell(16, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
+            double value = getCellNumeric(cell, evaluator);
+            columnQValues.add(value);
+        }
+
+        return columnQValues;
+    }
+
+    //  xử lý các loại ô -> trả về giá trị số. nếu là ô số -> sử dụng FormulaEvaluator để tính giá trị
+    private double getCellNumeric(Cell cell, FormulaEvaluator evaluator) {
+        if (cell == null || cell.getCellType() == CellType.BLANK) {
+            return 0.0;
+        }
+        if (cell.getCellType() == CellType.NUMERIC) {
+            return cell.getNumericCellValue();
+        }
+        if (cell.getCellType() == CellType.FORMULA) {
+            try {
+                return evaluator.evaluate(cell).getNumberValue();
+            } catch (Exception e) {
+                return 0.0;
+            }
+        }
+        return 0.0;
     }
 }

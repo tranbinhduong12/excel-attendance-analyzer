@@ -2,6 +2,8 @@ package bangCong.service;
 
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+
 
 import java.util.List;
 import java.util.Map;
@@ -22,5 +24,8 @@ public interface ExcelService {
 
     // tổng số tiền mỗi ca
     public List<Double> totalPriceCa(Sheet sheet,int indexStarRow,String findInfo,int indexEndRow);
+
+    // lấy giá trị cột Q
+    public List<Double> extractColumnQ(Sheet sheet, int startRow, int endRow, Workbook workbook);
 
 }
