@@ -1,4 +1,4 @@
-package bangCong.utils;
+package bangCong.service;
 
 import org.apache.poi.ss.usermodel.*;
 
@@ -77,6 +77,27 @@ public class ExcelUtils {
             return cell.getNumericCellValue();
         }
         return 0;
+    }
+
+    public static boolean isSunday(Sheet sheet, int day) {
+        Row row = sheet.getRow(5); // Dòng tiêu đề ca
+        if (row == null) return false;
+
+        int colsPerDay = 5;
+        int startCol = 16 + (day - 1) * colsPerDay;
+
+        // Kiểm tra cột đầu tiên trong nhóm 5 cột của ngày đó
+        for (int i = 0; i < 5; i++) {
+            Cell cell = row.getCell(startCol + i);
+            if (cell != null) {
+                String text = cell.toString().toUpperCase();
+                if (text.contains("WK")){
+                    System.out.println("........" + i + text);
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
 }

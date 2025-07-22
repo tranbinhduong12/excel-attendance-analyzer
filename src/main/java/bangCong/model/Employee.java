@@ -1,26 +1,21 @@
 package bangCong.model;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class Employee {
     private String id;
     private String name;
-    private Double totalHoursWorked; // tổng giờ làm = GC + TC + GC1 + TC1 + WK-D + WK-N
-    private Integer totalDaysWorked; // tổng lương = (GC*giáGC + TC*giáTC + ...) + tiền WK
-    private Double totalEaring;
-    private List<Double> priceMoiCa;
+    private Double totalHoursWorked;
+    private Integer totalDaysWorked;
+    private Double totalPrice;
+    private List<Double> priceCacCa;
 
-    public Employee(String id, String name) {
-        this.id = id;
-        this.name = name;
-    }
+//    private List<Double> priceMoiCa;
 
-    public Employee(String id, String name, Double totalHoursWorked, Integer totalDaysWorked, Double totalEaring) {
-        this.id = id;
-        this.name = name;
-        this.totalHoursWorked = totalHoursWorked;
-        this.totalDaysWorked = totalDaysWorked;
-        this.totalEaring = totalEaring;
+    public Employee() {
+
     }
 
     public String getId() {
@@ -55,45 +50,19 @@ public class Employee {
         this.totalDaysWorked = totalDaysWorked;
     }
 
-    public Double getTotalEaring() {
-        return totalEaring;
+    public Double getTotalPrice() {
+        return totalPrice;
     }
 
-    public void setTotalEaring(Double totalEaring) {
-        this.totalEaring = totalEaring;
+    public void setTotalPrice(Double totalPrice) {
+        this.totalPrice = totalPrice;
     }
 
-    private Double actualTotalFromExcel; // so sánh tổng tiền tính đc với tổng tiền ở cột Q
-
-    public void setActualTotalFromExcel(Double actualTotalFromExcel) {
-        this.actualTotalFromExcel = actualTotalFromExcel;
+    public List<Double> getPriceCacCa() {
+        return priceCacCa;
     }
 
-    public Double getActualTotalFromExcel() {
-        return actualTotalFromExcel;
-    }
-
-//    @Override
-//    public String toString() {
-//        return "employee: " + id + " - " + name + "\n"
-//                + " Tổng giờ: " + totalHoursWorked + "h\n"
-//                + " Tổng tiền: " + String.format("%,.0f", totalEaring) + " VND\n";
-//    }
-
-    @Override
-    public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("Employee: ").append(id).append(" - ").append(name).append("\n");
-        sb.append(" Tổng giờ: ").append(totalHoursWorked).append("h\n");
-        sb.append(" Tổng tiền (tính): ").append(String.format("%,.0f", totalEaring)).append(" VND\n");
-        sb.append(" Tổng tiền (trong file): ").append(String.format("%,.0f", actualTotalFromExcel)).append(" VND\n");
-
-        if (Math.abs(totalEaring - actualTotalFromExcel) > 1e-2) {
-            sb.append("Kết quả: Không khớp\n");
-        } else {
-            sb.append("Kết quả: Khớp\n");
-        }
-
-        return sb.toString();
+    public void setPriceCacCa(List<Double> priceCacCa) {
+        this.priceCacCa = priceCacCa;
     }
 }
