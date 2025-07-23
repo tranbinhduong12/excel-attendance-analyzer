@@ -105,13 +105,109 @@ public class Main {
                 String comparison = (difference < 0.01) ? "Khớp" : "Không khớp (chênh lệch: " + dc.format(difference) + ")";
                 System.out.println(
                         "Nhân viên:\n" +
-                                "\tTên: " + emp.getName() + "\n" +
                                 "\tMã NV: " + emp.getId() + "\n" +
+                                "\tTên: " + emp.getName() + "\n" +
                                 "\tTổng số giờ làm: " + emp.getTotalHoursWorked() + "\n" +
                                 "\tTổng tiền các ca làm: " + dc.format(emp.getTotalPrice()) + "\n" +
                                 "\tTổng tiền cột Q: " + dc.format(colQ) + "\n" +
                                 "\tSo sánh với cột Q: " + comparison + "\n"
                 );
+            }
+
+            System.out.print("Nhập ngày đầu để tìm kiếm: ");
+            Scanner sc = new Scanner(System.in);
+            int startDay = sc.nextInt();
+            System.out.print("Nhập ngày cuối để tìm kiếm: ");
+            int endDay = sc.nextInt();
+            System.out.println("Vị trí ngày đầu tìm thấy ở cột thứ: "+ excelService.findPositionCell(sheet,startDay));
+            System.out.println("Vị trí ngày cuối tìm thấy ở cột thứ: "+(excelService.findPositionCell(sheet,endDay+1)-1));
+            List<Double>[] arrayListHourseWork = new List[listNameNVs.size()];
+
+            for(int i=0;i<listNameNVs.size();i++){
+                List<Double> countWorkingDaysByDate = new ArrayList<>();
+                double totalHourseWork = 0;
+//                int findPositionCellString = excelService.findPositionCell(sheet,listNameNVs.get(i));
+                int findPositionCellString = excelService.findPositionCell(sheet, listNameNVs.get(i));
+                countWorkingDaysByDate.addAll(excelService.countWorkingDaysByDate(sheet, excelService.findPositionCell(sheet,startDay),findPositionCellString, excelService.findPositionCell(sheet,endDay+1)-1));
+                arrayListHourseWork[i] = countWorkingDaysByDate;
+                Long countWorkEmployee = countWorkingDaysByDate.stream().filter(x -> x>0).count();
+                for(int j=0;j<countWorkingDaysByDate.size();j++){
+                    totalHourseWork += countWorkingDaysByDate.get(j);
+                }
+                //ngày có làm việc - lương mỗi ngày
+                System.out.println(
+                        "Nhân viên:\n" +
+                                "\tTên: " + listNameNVs.get(i) + "\n" +
+                                "\tMã NV: " + listMaNVs.get(i) + "\n" +
+                                "\tThời gian làm việc: được tìm kiếm từ ngày " + startDay + " đến hết ngày " + endDay + "\n" +
+                                "\tTổng số ngày làm: " + countWorkEmployee + " ngày\n" +
+                                "\tTổng số giờ làm: " + totalHourseWork + " giờ\n"
+                );
+            }
+
+            // luu cac ngay chu nhat vi tri cot
+            List<Integer> daySundays = new ArrayList<>();
+            // luu cac thu la ngay chu nhat (1->5) thì luu 2 la ngay cn
+            for(int m = startDay;m<=endDay;m++){
+                int findPosition = excelService.findPositionCell(sheet,m);
+                if(excelService.checkDaySunDay(sheet,findPosition,"WK")){
+                    daySundays.add(m);
+                }
+            }
+
+//            System.out.println("Tìm kiếm từ ngày "+startDay+" đến hết ngày "+endDay+" có tổng số ngày chủ nhật: "+daySundays.size());
+            for (int j = 0; j < listNameNVs.size(); j++) {
+                System.out.println(String.format("\n%-2s - %-1s", "Nhân viên", "Mã NV"));
+                Map<String,Double> infoCa = map.get(listMaNVs.get(j));
+                System.out.println(String.format("%-2s - %-1s", listNameNVs.get(j), listMaNVs.get(j)));
+                System.out.println("-".repeat(20));
+                int k = 0;
+                for (int i = startDay; i < endDay; i++) {
+                    double sumPriceInDay = 0;
+                    double totalHoursWork = 0;
+                    if (daySundays.contains(i)) {
+                        Double[] x = new Double[tongCaDaySunDay];
+                        for (int n = 0; n < tongCaDaySunDay; n++) {
+//                            System.out.println("check arrayListHourseWork[j]  " + arrayListHourseWork[j]);
+                            if(k<arrayListHourseWork[j].size()) {
+                                x[n] = arrayListHourseWork[j].get(k);
+                            }else{
+                                x[n] = 0.0;
+                            }
+                            totalHoursWork += x[n];
+                            if (x[n] > 0) {
+                                Double tienLamTrongCa = infoCa.get(listMaNVs.get(j)+listCaDaySunday.get(n))*x[n];
+                                if(infoCa.get(listMaNVs.get(j)+listCaDaySunday.get(n))==null) {
+                                    System.out.print("ERROR");
+                                }
+                                System.out.println(String.format("- Ngày thứ %-2d - Ca: %-10s - Số giờ: %.2f - Tổng tiền: %.2f",
+                                        i, listCaDaySunday.get(n), x[n],tienLamTrongCa));
+                                sumPriceInDay += tienLamTrongCa;
+                            }
+                            k += 1;
+                        }
+                    } else {
+                        Double[] x = new Double[tenCacCa.size()];
+                        for (int m = 0; m < tongCaNgayThuong; m++) {
+                            if(k<arrayListHourseWork[j].size()) {
+                                x[m] = arrayListHourseWork[j].get(k);
+                            }else{
+                                x[m] = 0.0;
+                            }
+
+                            totalHoursWork += x[m];
+                            if (x[m] > 0) {
+                                Double tienLamTrongCa = infoCa.get(listMaNVs.get(j)+listCaNgayThuong.get(m))*x[m];
+                                System.out.println(String.format("-Ngày thứ %-3d - Ca: %-1s - Số giờ: %.2f - Tổng tiền: %.2f",
+                                        i, listCaNgayThuong.get(m), x[m],tienLamTrongCa));
+                                sumPriceInDay+= tienLamTrongCa;
+                            }
+                            k += 1;
+                        }
+                    }
+                    System.out.println(String.format("Tổng số giờ làm trong ngày thứ %-3d: %.2f", i, totalHoursWork));
+                    System.out.println(String.format("Tổng tien làm trong ngày thứ %-3d: %.2f", i, sumPriceInDay));
+                }
             }
 
         } catch (IOException e) {

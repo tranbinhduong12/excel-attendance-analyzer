@@ -142,32 +142,88 @@ public class ExcelServiceImpl implements ExcelService {
         return totalPriceCa;
     }
 
-
-
-
-    public Map<String, Double> getPriceMap(Sheet sheet) {
-
-        Map<String, Double> map = new HashMap<>();
-        Row shiftRow = sheet.getRow(5);  // hàng tên ca
-        Row priceRow = sheet.getRow(6);  // hàng giờ và giá
-
-        if (shiftRow == null || priceRow == null) return map;
-
-        for (int i = 0; i < shiftRow.getLastCellNum(); i++) {
-            Cell shiftCell = shiftRow.getCell(i);
-            if (shiftCell == null) continue;
-
-            String shiftName = shiftCell.toString().trim();
-            // giá nằm ở cột bên phải (i+1) tại dòng 5
-            Cell priceCell = priceRow.getCell(i + 1);
-
-            if (priceCell != null && priceCell.getCellType() == CellType.NUMERIC) {
-                double priceFor8Hours = priceCell.getNumericCellValue();
-                double pricePerHour = priceFor8Hours / 8.0;
-                map.put(shiftName, pricePerHour); // đơn giá theo giờ
+    // lấy số giờ làm việc của một nhân viên trong khoảng cột từ indexStartColumn đến indexEndColumn tại dòng indexRow.
+    public List<Double> countWorkingDaysByDate(Sheet sheet,int indexStartColumn,int indexRow,int indexEndColumn) {
+        List<Double> workingDaysByDate = new ArrayList<>();
+        for (Row row : sheet) {
+            if(sheet.getRow(indexRow) == null){
+                System.out.println("Row is null");
+                return null;
             }
+            if(row == sheet.getRow(indexRow)){
+                for(int indexColumn=indexStartColumn;indexColumn<=indexEndColumn;indexColumn++){
+                    Cell cellTypeHourWork = sheet.getRow(indexRow).getCell(indexColumn, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
+                    if(cellTypeHourWork.getColumnIndex()<=indexEndColumn){
+                        if (cellTypeHourWork.getCellType() == CellType.NUMERIC ) { // nếu là ô số -> thêm vào list
+                            workingDaysByDate.add(cellTypeHourWork.getNumericCellValue());
+                        }else if (cellTypeHourWork.getCellType() == CellType.BLANK) { // nếu trống -> thêm 0.0
+                            workingDaysByDate.add(0.0);
+                        }
+                    }
+                }
+            }
+
         }
-        return map;
+        return workingDaysByDate;
+    }
+
+    //     tìm vị trí cột dòng chứa giá trị value( số hoặc chuỗi)
+    public int findPositionCell(Sheet sheet, Integer value) {
+        int indexColumn = -1;
+        for (Row row : sheet) {
+            if(value instanceof Integer) { // nếu là số kiểm tra kiểu numeric
+                if(indexColumn==-1){
+                    for (Cell cell : row) {
+                        if (cell.getCellType() == CellType.NUMERIC && (int)cell.getNumericCellValue() ==(int) value) {
+                            indexColumn = cell.getColumnIndex();
+                            break;
+                        }
+                    }
+                    continue;
+                }
+            }
+//            else if(value instanceof String) { // nếu là chuỗi -> kiểm tra kiểu String
+//                if(indexColumn==-1){
+//                    for (Cell cell : row) {
+//                        if (cell.getCellType() == CellType.STRING && cell.getStringCellValue().equalsIgnoreCase(value.toString())) {
+//                            indexColumn = cell.getRowIndex();
+//                        }
+//                    }
+//                    continue;
+//                }
+//            }
+
+        }
+        return indexColumn;
+    }
+
+    public int findPositionCell(Sheet sheet, String value) {
+        int indexColumn = -1;
+        for (Row row : sheet) {
+            if(value instanceof String) { // nếu là chuỗi -> kiểm tra kiểu String
+                if(indexColumn==-1){
+                    for (Cell cell : row) {
+                        if (cell.getCellType() == CellType.STRING && cell.getStringCellValue().equalsIgnoreCase(value.toString())) {
+                            indexColumn = cell.getRowIndex();
+                        }
+                    }
+                    continue;
+                }
+            }
+
+        }
+        return indexColumn;
+    }
+
+
+
+    //     kiểm tra ô tại dòng 5, cột position có chứa chuỗi bắt đầu bằng findInfo
+    public boolean checkDaySunDay(Sheet sheet,int position,String findInfo) {
+        Cell cellTypeHourWork = sheet.getRow(5).getCell(position, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
+        if (cellTypeHourWork.getCellType() == CellType.STRING && cellTypeHourWork.getStringCellValue().startsWith(findInfo) ) {
+            return true;
+        }
+        return false;
     }
 
     // lấy giá trị cột Q

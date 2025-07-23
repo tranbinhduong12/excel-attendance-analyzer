@@ -28,4 +28,16 @@ public interface ExcelService {
     // lấy giá trị cột Q
     public List<Double> extractColumnQ(Sheet sheet, int startRow, int endRow, Workbook workbook);
 
+    // lấy số giờ làm của nhân viên trong khoảng ngày được chọn
+    public List<Double> countWorkingDaysByDate(Sheet sheet,int indexStartColumn,int indexRow,int indexEndColumn);
+
+    //tìm vị trí của cột ngày bắt đầu và ngày kết thúc trong sheet
+    public int findPositionCell(Sheet sheet, Integer value);
+
+
+    public int findPositionCell(Sheet sheet, String value);
+
+    //     kiểm tra ngày chủ nhật
+    public boolean checkDaySunDay(Sheet sheet,int position,String findInfo);
+
 }
